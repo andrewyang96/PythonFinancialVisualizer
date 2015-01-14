@@ -1,19 +1,14 @@
 from datetime import datetime as dt
-import matplotlib.pyplot as pyplot
+import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import ystockquote as ysq
 
-
-def plot(ticker, x,y):
-    pyplot.close("all")
-    fig, ax = pyplot.subplots(1)
-    ax.plot(x,y)
-
-    fig.autofmt_xdate()
-
-    ax.fmt_xdata = mdates.DateFormatter("%Y-%m-%d")
-    pyplot.title("Stock Prices for {0} From {1:%Y-%m-%d} to {2:%Y-%m-%d}".format(ticker.upper(), min(x), max(x)))
-    pyplot.show()
+def setup(start, end, tickers):
+    plt.close("all")
+    plt.title("Stock Prices for {0} From {1} to {2}".format([ticker.upper() for ticker in tickers], start, end))
+    plt.xlabel("Date")
+    plt.ylabel("Price")
+    plt.xticks(rotation=30)
 
 # returns tuple
 def get_daily_closes(ticker, start, end):
@@ -39,9 +34,13 @@ def str2datetime(s):
     split[:] = [int(e) for e in split]
     return dt(*split)
 
-def visualize(ticker, start, end):
-    c = get_daily_closes(ticker, start, end)
-    plot(ticker, *c)
+def visualize(tickers, start, end):
+    setup(start, end, tickers)
+    for ticker in tickers:
+        c = get_daily_closes(ticker, start, end)
+        plt.plot(*c, label=ticker.upper())
+    plt.legend()
+    plt.show()
 
 if __name__ == "__main__":
-    visualize("aapl", "2013-01-01", "2015-01-01")
+    visualize(['spy', 'vfinx'], "2014-01-01", "2015-01-01")
